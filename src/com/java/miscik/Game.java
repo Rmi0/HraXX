@@ -1,5 +1,7 @@
 package com.java.miscik;
 
+import com.java.miscik.exceptions.InvalidTileException;
+
 /**
  * Created by Rolo on 5. 10. 2017.
  */
@@ -20,6 +22,11 @@ public class Game {
         int tileY = Integer.parseInt(tile.substring(1));
 
         if (tileX > 8 || tileY > 8 || tileX < 0 || tileY < 0) return false;
-        /* */ return true;
+        try {
+            if (gameField.read(tileX, tileY) != Tile.EMPTY) return false;
+        } catch (InvalidTileException ex) {ex.printStackTrace();}
+
+        /////////////////////////////////
+        return true;
     }
 }
