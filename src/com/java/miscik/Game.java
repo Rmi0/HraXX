@@ -2,6 +2,7 @@ package com.java.miscik;
 
 import com.java.miscik.exceptions.InvalidTileException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,21 +18,61 @@ public class Game {
         this.gameField = new Field();
     }
 
-    public void move(String tile) {
-        if (!canMove(tile)) return;
+    public void move(String tile) throws InvalidTileException {
+        String directions = getPossibleDirections(tile);
+        if (directions == null) return;
 
-
-    }
-
-    public boolean canMove(String tile) {
-        if (tile.length() != 2) return false;
-        if (!Character.isLetter(tile.toCharArray()[0]) || !Character.isDigit(tile.toCharArray()[1])) return false;
         int tileY = Integer.parseInt(tile.substring(1))-1;
         int tileX = tile.toUpperCase().toCharArray()[0] - 'A';
 
-        if (tileX > 7 || tileY > 7 || tileX < 0 || tileY < 0) return false;
+        int opposingPlayer = this.plr == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
+
+        gameField.reverseTile(tileX,tileY);
+
+        for (int i = 0; i < directions.length(); i++) {
+            int dir = directions.charAt(i)-48;
+            if (writeToTiles(opposingPlayer,tileX,tileY,getXMovement(dir),getYMovement(dir))) {
+                plr = opposingPlayer;
+            }
+        }
+    }
+
+    private int getXMovement(int direction) {
+        switch (direction) {
+            case 1: return -1;
+            case 3: return 1;
+            case 4: return -1;
+            case 6: return 1;
+            case 7: return -1;
+            case 9: return 1;
+        }
+        return 0;
+    }
+
+    private int getYMovement(int direction) {
+        switch (direction) {
+            case 1: return 1;
+            case 2: return 1;
+            case 3: return 1;
+            case 7: return -1;
+            case 8: return -1;
+            case 9: return -1;
+        }
+        return 0;
+    }
+
+    //
+    public String getPossibleDirections(String tile) {
+        String directions = "";
+
+        if (tile.length() != 2) return null;
+        if (!Character.isLetter(tile.toCharArray()[0]) || !Character.isDigit(tile.toCharArray()[1])) return null;
+        int tileX = Integer.parseInt(tile.substring(1))-1;
+        int tileY = tile.toUpperCase().toCharArray()[0] - 'A';
+
+        if (tileX > 7 || tileY > 7 || tileX < 0 || tileY < 0) return null;
         try {
-            if (gameField.read(tileX, tileY) != Tile.EMPTY) return false;
+            if (gameField.read(tileX, tileY) != Tile.EMPTY) return null;
 
             int x = tileX;
             int y = tileY;
@@ -42,36 +83,36 @@ public class Game {
 
             if (tileX < 6) {
                 if(checkProgression(opposingPlayer, x+1, y, 1, 0))
-                    return true;
+                    directions += "6";
             }
             if (tileX > 1) {
                 if(checkProgression(opposingPlayer, x-1, y, -1, 0))
-                    return true;
+                    directions += "4";
             }
             if (tileY < 6) {
                 if(checkProgression(opposingPlayer, x, y+1, 0, 1))
-                    return true;
+                    directions += "2";
             }
             if (tileY > 1) {
                 if(checkProgression(opposingPlayer, x, y-1, 0, -1))
-                    return true;
+                    directions += "8";
             }
             ///////
             if (tileX < 6 && tileY < 6) {
                 if(checkProgression(opposingPlayer, x+1, y+1, 1, 1))
-                    return true;
+                    directions += "3";
             }
             if (tileX > 1 && tileY < 6) {
                 if(checkProgression(opposingPlayer, x-1, y+1, -1, 1))
-                    return true;
+                    directions += "1";
             }
             if (tileX > 1 && tileY > 1) {
                 if(checkProgression(opposingPlayer, x-1, y-1, -1, -1))
-                    return true;
+                    directions += "7";
             }
             if (tileX < 6 && tileY > 1) {
                 if(checkProgression(opposingPlayer, x+1, y-1, 1, -1))
-                    return true;
+                    directions += "9";
             }
 
 
@@ -80,7 +121,7 @@ public class Game {
         }
 
         /////////////////////////////////
-        return false;
+        return directions.equals("")?null:directions;
     }
 
     private boolean checkProgression(int opposingPlayer, int x, int y, int dirX, int dirY) throws InvalidTileException {
@@ -91,26 +132,36 @@ public class Game {
                 return count>0;
             if (gameField.read(x,y) == Tile.EMPTY)
                 return false;
-            x=x+dirX;
-            y=y+dirY;
+            x+=dirX;
+            y+=dirY;
         }
 
         return false;
     }
 
-    private List getTilesToChange(int opposingPlayer, int x, int y, int dirX, int dirY) throws InvalidTileException {
-        List<>
+    private boolean writeToTiles(int opposingPlayer, int x, int y, int dirX, int dirY) throws InvalidTileException {
+        System.out.println(x+" "+y+" "+dirX+" "+dirY+" "+opposingPlayer );
+        if (!checkProgression(opposingPlayer,x,y,dirX,dirY)) return false;
+        boolean wrote = false;
 
         while (x < 7 && y < 7 && x > 0 && y > 0) {
-            if (gameField.read(x,y) == opposingPlayer) count++;
+            if (gameField.read(x,y) == opposingPlayer) {
+                gameField.reverseTile(x,y);
+                System.out.println("auyhu");
+                wrote = true;
+            }
             if (gameField.read(x,y) == plr)
-                return count>0;
+                return wrote;
             if (gameField.read(x,y) == Tile.EMPTY)
                 return false;
-            x=x+dirX;
-            y=y+dirY;
+            x+=dirX;
+            y+=dirY;
         }
 
-        return false;
+        return wrote;
+    }
+
+    public Field getGameField() {
+        return gameField;
     }
 }
