@@ -27,11 +27,10 @@ public class Game {
 
         int opposingPlayer = this.plr == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
 
-        gameField.reverseTile(tileX,tileY);
-
         for (int i = 0; i < directions.length(); i++) {
             int dir = directions.charAt(i)-48;
             if (writeToTiles(opposingPlayer,tileX,tileY,getXMovement(dir),getYMovement(dir))) {
+                gameField.write(tileX,tileY,this.plr);
                 plr = opposingPlayer;
             }
         }
@@ -126,6 +125,7 @@ public class Game {
 
     private boolean checkProgression(int opposingPlayer, int x, int y, int dirX, int dirY) throws InvalidTileException {
         int count=0;
+
         while (x < 7 && y < 7 && x > 0 && y > 0) {
             if (gameField.read(x,y) == opposingPlayer) count++;
             if (gameField.read(x,y) == plr)
@@ -140,22 +140,23 @@ public class Game {
     }
 
     private boolean writeToTiles(int opposingPlayer, int x, int y, int dirX, int dirY) throws InvalidTileException {
-        System.out.println(x+" "+y+" "+dirX+" "+dirY+" "+opposingPlayer );
-        if (!checkProgression(opposingPlayer,x,y,dirX,dirY)) return false;
+        //if (!checkProgression(opposingPlayer,x,y,dirX,dirY)) return false;
         boolean wrote = false;
+
+        x+=dirY;
+        y+=dirX;
 
         while (x < 7 && y < 7 && x > 0 && y > 0) {
             if (gameField.read(x,y) == opposingPlayer) {
-                gameField.reverseTile(x,y);
-                System.out.println("auyhu");
+                gameField.write(x,y,this.plr);
                 wrote = true;
             }
             if (gameField.read(x,y) == plr)
                 return wrote;
             if (gameField.read(x,y) == Tile.EMPTY)
                 return false;
-            x+=dirX;
-            y+=dirY;
+            x+=dirY;
+            y+=dirX;
         }
 
         return wrote;

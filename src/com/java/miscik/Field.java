@@ -36,12 +36,23 @@ public class Field {
 
     public boolean reverseTile(int x, int y) throws InvalidTileException {
         if (x > 8 || y > 8 || x < 0 || y < 0)  throw new InvalidTileException();
+        if (read(x,y) == 0) return false;
         return this.gameField[x][y].setState(read(x,y) == Tile.PLAYER_A?Tile.PLAYER_B:Tile.PLAYER_A);
     }
 
     public int read(int x, int y) throws InvalidTileException {
         if (x > 8 || y > 8 || x < 0 || y < 0) throw new InvalidTileException();
         return this.gameField[x][y].getState();
+    }
+
+    public Point getPos(Tile tile) {
+        Point p = null;
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                if (this.gameField[x][y] == tile) p = new Point(x,y);
+            }
+        }
+        return p;
     }
 
     public Tile getTile(int x, int y) throws InvalidTileException {
