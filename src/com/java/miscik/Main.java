@@ -22,6 +22,7 @@ public class Main {
         System.out.println("----------");
         game.getGameField().printField();
         game.move("D6");
+        game.move("E6");
         game.getGameField().printField();
     }
 }
