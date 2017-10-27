@@ -22,19 +22,23 @@ public class Game {
         String directions = getPossibleDirections(tile);
         if (directions == null) return;
 
-        int tileY = Integer.parseInt(tile.substring(1))-1;
-        int tileX = tile.toUpperCase().toCharArray()[0] - 'A';
+        int tileX = Integer.parseInt(tile.substring(1))-1;
+        int tileY = tile.toUpperCase().toCharArray()[0] - 'A';
 
         int opposingPlayer = this.plr == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
+        boolean wrote = false;
 
         for (int i = 0; i < directions.length(); i++) {
             int dir = directions.charAt(i)-48;
             if (writeToTiles(opposingPlayer,tileX,tileY,getXMovement(dir),getYMovement(dir))) {
                 gameField.write(tileX,tileY,this.plr);
-                plr = opposingPlayer;
+                wrote = true;
             }
         }
+
+        if (wrote) this.plr = opposingPlayer;
     }
+
 
     private int getXMovement(int direction) {
         switch (direction) {
@@ -143,8 +147,8 @@ public class Game {
         //if (!checkProgression(opposingPlayer,x,y,dirX,dirY)) return false;
         boolean wrote = false;
 
-        x+=dirY;
-        y+=dirX;
+        x+=dirX;
+        y+=dirY;
 
         while (x < 7 && y < 7 && x > 0 && y > 0) {
             if (gameField.read(x,y) == opposingPlayer) {

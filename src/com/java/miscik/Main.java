@@ -1,6 +1,7 @@
 package com.java.miscik;
 
 import javax.swing.*;
+import java.util.Scanner;
 
 public class Main {
 
@@ -13,16 +14,12 @@ public class Main {
                 3,null, options, null);
         if (mode == 0) System.out.println("Console"); else if (mode == 1) System.out.println("GUI"); else System.exit(0);*/
         Game game=new Game();
-        System.out.println(game.getPossibleDirections("D6"));
-        System.out.println(game.getPossibleDirections("E6"));
-        System.out.println(game.getPossibleDirections("E3"));
-        System.out.println(game.getPossibleDirections("F6"));
-        System.out.println(game.getPossibleDirections("F4"));
-        System.out.println(game.getPossibleDirections("E4"));
-        System.out.println("----------");
+        Scanner sc = new Scanner(System.in);
         game.getGameField().printField();
-        game.move("D6");
-        game.move("E6");
-        game.getGameField().printField();
+        while (true) {
+            String move = sc.nextLine();
+            game.move(move);
+            game.getGameField().printField();
+        }
     }
 }

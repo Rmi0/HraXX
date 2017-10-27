@@ -30,34 +30,13 @@ public class Field {
     }
 
     public boolean write(int x, int y, int state) throws InvalidTileException {
-        if (x > 8 || y > 8 || x < 0 || y < 0)  throw new InvalidTileException();
+        if (x > 7 || y > 7 || x < 0 || y < 0)  throw new InvalidTileException();
         return this.gameField[x][y].setState(state);
     }
 
-    public boolean reverseTile(int x, int y) throws InvalidTileException {
-        if (x > 8 || y > 8 || x < 0 || y < 0)  throw new InvalidTileException();
-        if (read(x,y) == 0) return false;
-        return this.gameField[x][y].setState(read(x,y) == Tile.PLAYER_A?Tile.PLAYER_B:Tile.PLAYER_A);
-    }
-
     public int read(int x, int y) throws InvalidTileException {
-        if (x > 8 || y > 8 || x < 0 || y < 0) throw new InvalidTileException();
+        if (x > 7 || y > 7 || x < 0 || y < 0) throw new InvalidTileException();
         return this.gameField[x][y].getState();
-    }
-
-    public Point getPos(Tile tile) {
-        Point p = null;
-        for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
-                if (this.gameField[x][y] == tile) p = new Point(x,y);
-            }
-        }
-        return p;
-    }
-
-    public Tile getTile(int x, int y) throws InvalidTileException {
-        if (x > 8 || y > 8 || x < 0 || y < 0) throw new InvalidTileException();
-        return this.gameField[x][y];
     }
 
     public boolean isFilled() {
@@ -86,13 +65,13 @@ public class Field {
         System.out.println("    1 2 3 4 5 6 7 8");
         System.out.println();
         try {
-            for (int x = 0; x < 8; x++) {
-                System.out.print((char)(x+'A')+"   ");
-                for (int y = 0; y < 8; y++) {
+            for (int y = 0; y < 8; y++) {
+                System.out.print((char)(y+'A')+"   ");
+                for (int x = 0; x < 8; x++) {
                     if (read(x,y) == 1) System.out.print("A ");
                     if (read(x,y) == 2) System.out.print("B ");
                     if (read(x,y) == 0) System.out.print("0 ");
-                    if (y == 7) System.out.println();
+                    if (x == 7) System.out.println();
                 }
             }
         } catch (InvalidTileException ex) {
