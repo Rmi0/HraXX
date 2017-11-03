@@ -13,13 +13,8 @@ public class Main {
         int mode = JOptionPane.showOptionDialog(null,"Choose mode:","HraXX", 1,
                 3,null, options, null);
         if (mode == 0) System.out.println("Console"); else if (mode == 1) System.out.println("GUI"); else System.exit(0);*/
-        Game game=new Game();
-        Scanner sc = new Scanner(System.in);
-        game.getGameField().printField();
-        while (true) {
-            String move = sc.nextLine();
-            game.move(move);
-            game.getGameField().printField();
-        }
+        Game game = new Game();
+        game.startGameLoop();
+
     }
 }

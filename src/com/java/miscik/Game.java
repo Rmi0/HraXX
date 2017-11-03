@@ -4,6 +4,7 @@ import com.java.miscik.exceptions.InvalidTileException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by Rolo on 5. 10. 2017.
@@ -18,8 +19,32 @@ public class Game {
         this.gameField = new Field();
     }
 
+    public void startGameLoop() throws InvalidTileException {
+        int opposingPlayer = this.plr == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
+
+        Scanner sc = new Scanner(System.in);
+        this.getGameField().printField();
+        while (true) {
+            System.out.println("IT'S PLAYER"+this.plr+"'S TURN!");
+            String move = sc.nextLine();
+            this.move(move);
+            this.getGameField().printField();
+            if (gameField.isFilled()) {
+                if (gameField.getTileCount(1) > 32) {
+                    System.out.println("PLAYER 1 WINS!");
+                } else if (gameField.getTileCount(2) > 32) {
+                    System.out.println("PLAYER 2 WINS!");
+                } else {
+                    System.out.println("IT'S A TIE!");
+                }
+                System.exit(0);
+            }
+        }
+    }
+
     public void move(String tile) throws InvalidTileException {
         String directions = getPossibleDirections(tile);
+        System.out.println("::::: "+directions);
         if (directions == null) return;
 
         int tileX = Integer.parseInt(tile.substring(1))-1;
@@ -130,7 +155,7 @@ public class Game {
     private boolean checkProgression(int opposingPlayer, int x, int y, int dirX, int dirY) throws InvalidTileException {
         int count=0;
 
-        while (x < 7 && y < 7 && x > 0 && y > 0) {
+        while (x <= 7 && y <= 7 && x >= 0 && y >= 0) {
             if (gameField.read(x,y) == opposingPlayer) count++;
             if (gameField.read(x,y) == plr)
                 return count>0;
@@ -150,17 +175,17 @@ public class Game {
         x+=dirX;
         y+=dirY;
 
-        while (x < 7 && y < 7 && x > 0 && y > 0) {
+        while (x <= 7 && y <= 7 && x >= 0 && y >= 0) {
             if (gameField.read(x,y) == opposingPlayer) {
                 gameField.write(x,y,this.plr);
                 wrote = true;
             }
-            if (gameField.read(x,y) == plr)
+            else if (gameField.read(x,y) == plr)
                 return wrote;
-            if (gameField.read(x,y) == Tile.EMPTY)
+            else if (gameField.read(x,y) == Tile.EMPTY)
                 return false;
-            x+=dirY;
-            y+=dirX;
+            x+=dirX;
+            y+=dirY;
         }
 
         return wrote;

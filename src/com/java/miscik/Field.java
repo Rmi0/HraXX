@@ -68,9 +68,9 @@ public class Field {
             for (int y = 0; y < 8; y++) {
                 System.out.print((char)(y+'A')+"   ");
                 for (int x = 0; x < 8; x++) {
-                    if (read(x,y) == 1) System.out.print("A ");
-                    if (read(x,y) == 2) System.out.print("B ");
-                    if (read(x,y) == 0) System.out.print("0 ");
+                    if (read(x,y) == Tile.PLAYER_A) System.out.print("A ");
+                    if (read(x,y) == Tile.PLAYER_B) System.out.print("B ");
+                    if (read(x,y) == Tile.EMPTY) System.out.print("0 ");
                     if (x == 7) System.out.println();
                 }
             }
