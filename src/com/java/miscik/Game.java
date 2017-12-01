@@ -20,12 +20,17 @@ public class Game {
     }
 
     public void startGameLoop() throws InvalidTileException {
-        int opposingPlayer = this.plr == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
 
         Scanner sc = new Scanner(System.in);
         this.getGameField().printField();
         while (true) {
             System.out.println("IT'S PLAYER"+this.plr+"'S TURN!");
+            if (!isMovementPossible()) {
+                System.out.println("PLAYER"+this.plr+" IS NOT ABLE TO MOVE!");
+                int opposingPlayer = this.plr == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
+                this.plr = opposingPlayer;
+                continue;
+            }
             String move = sc.nextLine();
             this.move(move);
             this.getGameField().printField();
@@ -44,7 +49,7 @@ public class Game {
 
     public void move(String tile) throws InvalidTileException {
         String directions = getPossibleDirections(tile);
-        System.out.println("::::: "+directions);
+        //System.out.println(tile);
         if (directions == null) return;
 
         int tileX = Integer.parseInt(tile.substring(1))-1;
@@ -142,8 +147,6 @@ public class Game {
                 if(checkProgression(opposingPlayer, x+1, y-1, 1, -1))
                     directions += "9";
             }
-
-
         } catch (InvalidTileException ex) {
             ex.printStackTrace();
         }
@@ -191,7 +194,24 @@ public class Game {
         return wrote;
     }
 
+    public boolean isMovementPossible() {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                if (getPossibleDirections(""+(char)(y+'A')+(x+1)) != null) return true;
+            }
+        }
+        return false;
+    }
+
     public Field getGameField() {
         return gameField;
+    }
+
+    public int getPlr() {
+        return plr;
+    }
+
+    public void setPlr(int plr) {
+        this.plr = plr;
     }
 }
