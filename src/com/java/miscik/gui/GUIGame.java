@@ -21,10 +21,14 @@ public class GUIGame extends Canvas implements Runnable {
     private Thread thread;
     private boolean running;
 
+    private boolean renderInfo;
+
     public GUIGame(Game game) {
         this.game = game;
         this.running = false;
         this.thread = null;
+
+        this.renderInfo = false;
 
         this.setPreferredSize(new Dimension(WIDTH,HEIGHT));
         this.setMinimumSize(new Dimension(WIDTH,HEIGHT));
@@ -67,6 +71,9 @@ public class GUIGame extends Canvas implements Runnable {
     }
 
     private void tick() {
+        int blueTiles = game.getGameField().getTileCount(Tile.PLAYER_A);
+        int redTiles = game.getGameField().getTileCount(Tile.PLAYER_B);
+        if (game.getGameField().isFilled() || blueTiles == 0 || redTiles == 0) return;
         if (!game.getGameField().isFilled()) {
             int opposingPlayer = game.getPlr() == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
             if (!game.isMovementPossible()) game.setPlr(opposingPlayer);
@@ -104,6 +111,21 @@ public class GUIGame extends Canvas implements Runnable {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        int blueTiles = game.getGameField().getTileCount(Tile.PLAYER_A);
+        int redTiles = game.getGameField().getTileCount(Tile.PLAYER_B);
+
+        //RENDER INFORMATION
+        if (renderInfo) {
+            int scale = 3;
+
+            int bluePercent = (int)Math.ceil(blueTiles /(blueTiles+redTiles)*100);
+            int redPercent = (int)Math.floor(100 - bluePercent);
+
+            g.setColor(new Color(35, 25, 170));
+            g.fillRect(10, HEIGHT - 60, bluePercent * scale, 50);
+            g.setColor(new Color(170, 25, 35));
+            g.fillRect(10 + bluePercent * scale, HEIGHT - 60, redPercent * scale, 50);
+        }
         //RENDER CURRENT PLAYER
         g2d.setColor(game.getPlr()==Tile.PLAYER_A? new Color(35,25,170) : new Color(170,25,35));
         g2d.setFont(g.getFont().deriveFont(32f));
@@ -112,9 +134,9 @@ public class GUIGame extends Canvas implements Runnable {
         g2d.drawString(text,(WIDTH-16-fm.stringWidth(text)/2),32);
         //---------------------------------------------------------
         //RENDER WINNER
-        if (game.getGameField().isFilled()) {
-            if (game.getGameField().getTileCount(Tile.PLAYER_A) == 32) text = "IT'S A TIE!";
-            else if (game.getGameField().getTileCount(Tile.PLAYER_A) > 32) text = "PLAYER A WON!";
+        if (game.getGameField().isFilled() || blueTiles == 0 || redTiles == 0) {
+            if (blueTiles == redTiles) text = "IT'S A TIE!";
+            else if (blueTiles > redTiles) text = "PLAYER A WON!";
             else text = "PLAYER B WON!";
             g2d.setFont(g.getFont().deriveFont(64f));
             g2d.setColor(Color.GREEN);
@@ -127,6 +149,10 @@ public class GUIGame extends Canvas implements Runnable {
     }
 
     public void mousePressed(MouseEvent e) {
+        int blueTiles = game.getGameField().getTileCount(Tile.PLAYER_A);
+        int redTiles = game.getGameField().getTileCount(Tile.PLAYER_B);
+        if (game.getGameField().isFilled() || blueTiles == 0 || redTiles == 0) return;
+
         if (e.getButton() == MouseEvent.BUTTON1) {
             int x = e.getX()/TILE_WIDTH;
             int y = e.getY()/TILE_HEIGHT;
@@ -137,9 +163,24 @@ public class GUIGame extends Canvas implements Runnable {
     }
 
     public void keyPressed(KeyEvent e) {
+        //RESTART
         if (e.getKeyChar() == 'r' || e.getKeyChar() == 'R') {
             game.getGameField().initField();
             game.setPlr(Tile.PLAYER_A);
+        }
+        //UNDO
+        if (e.getKeyChar() == 'b' || e.getKeyChar() == 'B') {
+            game.undo();
+        }
+
+        if (e.getKeyChar() == 'i' || e.getKeyChar() == 'I') {
+            this.renderInfo = true;
+        }
+    }
+
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyChar() == 'i' || e.getKeyChar() == 'I') {
+            this.renderInfo = false;
         }
     }
 

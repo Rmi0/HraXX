@@ -39,6 +39,11 @@ public class Field {
         return this.gameField[x][y].getState();
     }
 
+    public Tile getTile(int x, int y) throws InvalidTileException {
+        if (x > 7 || y > 7 || x < 0 || y < 0) throw new InvalidTileException();
+        return this.gameField[x][y];
+    }
+
     public boolean isFilled() {
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {

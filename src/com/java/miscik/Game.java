@@ -13,14 +13,17 @@ public class Game {
 
     private int plr;
     private Field gameField;
+    private List<Tile> lastMove;
+    private Tile lastSelected;
 
     public Game() {
         this.plr = Tile.PLAYER_A;
         this.gameField = new Field();
+        this.lastMove = new ArrayList<>();
+        this.lastSelected = null;
     }
 
     public void startGameLoop() throws InvalidTileException {
-
         Scanner sc = new Scanner(System.in);
         this.getGameField().printField();
         while (true) {
@@ -48,6 +51,7 @@ public class Game {
     }
 
     public void move(String tile) throws InvalidTileException {
+        this.lastMove.removeAll(this.lastMove);
         String directions = getPossibleDirections(tile);
         //System.out.println(tile);
         if (directions == null) return;
@@ -62,6 +66,7 @@ public class Game {
             int dir = directions.charAt(i)-48;
             if (writeToTiles(opposingPlayer,tileX,tileY,getXMovement(dir),getYMovement(dir))) {
                 gameField.write(tileX,tileY,this.plr);
+                this.lastSelected = gameField.getTile(tileX, tileY);
                 wrote = true;
             }
         }
@@ -181,6 +186,7 @@ public class Game {
         while (x <= 7 && y <= 7 && x >= 0 && y >= 0) {
             if (gameField.read(x,y) == opposingPlayer) {
                 gameField.write(x,y,this.plr);
+                this.lastMove.add(gameField.getTile(x,y));
                 wrote = true;
             }
             else if (gameField.read(x,y) == plr)
@@ -201,6 +207,19 @@ public class Game {
             }
         }
         return false;
+    }
+
+    public void undo() {
+        if (this.lastSelected == null || this.lastMove.size() == 0) return;
+        for (Tile t : this.lastMove) {
+            t.setState(this.plr);
+        }
+        this.lastSelected.setState(Tile.EMPTY);
+        int opposingPlayer = this.plr == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
+        this.plr = opposingPlayer;
+
+        this.lastMove.removeAll(this.lastMove);
+        this.lastSelected = null;
     }
 
     public Field getGameField() {

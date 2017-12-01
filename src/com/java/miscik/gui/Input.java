@@ -53,6 +53,6 @@ public class Input implements MouseListener, KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        gui.keyReleased(e);
     }
 }
