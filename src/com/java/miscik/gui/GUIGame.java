@@ -1,9 +1,11 @@
 package com.java.miscik.gui;
 
 import com.java.miscik.Game;
+import com.java.miscik.ImageReader;
 import com.java.miscik.Tile;
 import com.java.miscik.exceptions.InvalidTileException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -22,6 +24,7 @@ public class GUIGame extends Canvas implements Runnable {
     private boolean running;
 
     private boolean renderInfo;
+    private int mouseX, mouseY;
 
     public GUIGame(Game game) {
         this.game = game;
@@ -29,6 +32,8 @@ public class GUIGame extends Canvas implements Runnable {
         this.thread = null;
 
         this.renderInfo = false;
+        this.mouseX = 0;
+        this.mouseY = 0;
 
         this.setPreferredSize(new Dimension(WIDTH,HEIGHT));
         this.setMinimumSize(new Dimension(WIDTH,HEIGHT));
@@ -43,6 +48,7 @@ public class GUIGame extends Canvas implements Runnable {
         frame.setVisible(true);
         Input input = new Input(this);
         this.addMouseListener(input);
+        this.addMouseMotionListener(input);
         this.addKeyListener(input);
         this.start();
     }
@@ -114,26 +120,54 @@ public class GUIGame extends Canvas implements Runnable {
         int blueTiles = game.getGameField().getTileCount(Tile.PLAYER_A);
         int redTiles = game.getGameField().getTileCount(Tile.PLAYER_B);
 
-        //RENDER INFORMATION
-        if (renderInfo) {
-            int scale = 3;
-
-            int bluePercent = (int)Math.ceil(blueTiles /(blueTiles+redTiles)*100);
-            int redPercent = (int)Math.floor(100 - bluePercent);
-
-            g.setColor(new Color(35, 25, 170));
-            g.fillRect(10, HEIGHT - 60, bluePercent * scale, 50);
-            g.setColor(new Color(170, 25, 35));
-            g.fillRect(10 + bluePercent * scale, HEIGHT - 60, redPercent * scale, 50);
-        }
-        //RENDER CURRENT PLAYER
+        //---------------------------------------------------------
+        //RENDER CURRENT PLAYER -----------------------------------
         g2d.setColor(game.getPlr()==Tile.PLAYER_A? new Color(35,25,170) : new Color(170,25,35));
         g2d.setFont(g.getFont().deriveFont(32f));
         FontMetrics fm = g2d.getFontMetrics();
         String text = game.getPlr()==Tile.PLAYER_A?"A":"B";
         g2d.drawString(text,(WIDTH-16-fm.stringWidth(text)/2),32);
         //---------------------------------------------------------
-        //RENDER WINNER
+        //RENDER OPTIONS ------------------------------------------
+        g.drawImage(ImageReader.readImg("undo.png"),WIDTH-31,HEIGHT-32,null);
+        g.drawImage(ImageReader.readImg("clear.png"),WIDTH-31,HEIGHT-64,null);
+        if (mouseX >= WIDTH-32) {
+            //UNDO
+            if (mouseY >= HEIGHT-32) {
+                g.setColor(new Color(255, 255, 255, 100));
+                g.fillRect(WIDTH - 132, HEIGHT - 32, 100, 32);
+                g.setColor(Color.BLACK);
+                g.getFont().deriveFont(16f);
+                g.drawString("UNDO", WIDTH - 127, HEIGHT - 5);
+            } else if (mouseY >= HEIGHT-64) {
+            //RESTART
+                g.setColor(new Color(255, 255, 255, 100));
+                g.fillRect(WIDTH - 132, HEIGHT - 64, 100, 32);
+                g.setColor(Color.BLACK);
+                g.getFont().deriveFont(16f);
+                g.drawString("RESET", WIDTH - 127, HEIGHT - 37);
+            }
+        }
+
+        //---------------------------------------------------------
+        //RENDER INFORMATION --------------------------------------
+        if (renderInfo) {
+            int scale = 5;
+            int offset = 5;
+
+            double bluePercent = Math.ceil(blueTiles*100/(blueTiles+redTiles));
+            double redPercent = 100 - bluePercent;
+
+            g.setColor(new Color(0,0,0,175));
+            g.fillRect(0,0,WIDTH,HEIGHT);
+
+            g.setColor(new Color(35, 25, 170));
+            g.fillRect(offset, HEIGHT - 50 - offset, (int)bluePercent * scale, 50);
+            g.setColor(new Color(170, 25, 35));
+            g.fillRect(offset + (int)bluePercent * scale, HEIGHT - 50 - offset, (int)redPercent * scale, 50);
+        }
+        //---------------------------------------------------------
+        //RENDER WINNER -------------------------------------------
         if (game.getGameField().isFilled() || blueTiles == 0 || redTiles == 0) {
             if (blueTiles == redTiles) text = "IT'S A TIE!";
             else if (blueTiles > redTiles) text = "PLAYER A WON!";
@@ -153,6 +187,17 @@ public class GUIGame extends Canvas implements Runnable {
         int redTiles = game.getGameField().getTileCount(Tile.PLAYER_B);
         if (game.getGameField().isFilled() || blueTiles == 0 || redTiles == 0) return;
 
+        if (mouseX > WIDTH-32) {
+            //UNDO
+            if (mouseY >= HEIGHT-32) game.undo();
+            //RESTART
+            if (mouseY >= HEIGHT-64 && mouseY < HEIGHT-32) {
+                game.getGameField().initField();
+                game.setPlr(Tile.PLAYER_A);
+            }
+            return;
+        }
+
         if (e.getButton() == MouseEvent.BUTTON1) {
             int x = e.getX()/TILE_WIDTH;
             int y = e.getY()/TILE_HEIGHT;
@@ -160,6 +205,11 @@ public class GUIGame extends Canvas implements Runnable {
                 game.move(""+(char)(y+'A')+(x+1));
             }catch (InvalidTileException ex) {ex.printStackTrace();}
         }
+    }
+
+    public void mouseMoved(MouseEvent e) {
+        this.mouseX = e.getX();
+        this.mouseY = e.getY();
     }
 
     public void keyPressed(KeyEvent e) {

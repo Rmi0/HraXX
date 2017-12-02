@@ -15,12 +15,14 @@ public class Game {
     private Field gameField;
     private List<Tile> lastMove;
     private Tile lastSelected;
+    private int lastPlr;
 
     public Game() {
         this.plr = Tile.PLAYER_A;
         this.gameField = new Field();
         this.lastMove = new ArrayList<>();
         this.lastSelected = null;
+        this.lastPlr = 0;
     }
 
     public void startGameLoop() throws InvalidTileException {
@@ -67,6 +69,7 @@ public class Game {
             if (writeToTiles(opposingPlayer,tileX,tileY,getXMovement(dir),getYMovement(dir))) {
                 gameField.write(tileX,tileY,this.plr);
                 this.lastSelected = gameField.getTile(tileX, tileY);
+                this.lastPlr = this.plr;
                 wrote = true;
             }
         }
@@ -210,14 +213,14 @@ public class Game {
     }
 
     public void undo() {
-        if (this.lastSelected == null || this.lastMove.size() == 0) return;
+        if (this.lastSelected == null || this.lastMove.size() == 0 || this.lastPlr == 0) return;
         for (Tile t : this.lastMove) {
             t.setState(this.plr);
         }
         this.lastSelected.setState(Tile.EMPTY);
-        int opposingPlayer = this.plr == Tile.PLAYER_A ? Tile.PLAYER_B : Tile.PLAYER_A;
-        this.plr = opposingPlayer;
+        this.plr = this.lastPlr;
 
+        this.lastPlr = 0;
         this.lastMove.removeAll(this.lastMove);
         this.lastSelected = null;
     }

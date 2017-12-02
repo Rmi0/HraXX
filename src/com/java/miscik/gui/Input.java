@@ -1,11 +1,8 @@
 package com.java.miscik.gui;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 
-public class Input implements MouseListener, KeyListener {
+public class Input implements MouseListener, MouseMotionListener, KeyListener {
     private GUIGame gui;
 
     public Input(GUIGame gui) {
@@ -37,6 +34,17 @@ public class Input implements MouseListener, KeyListener {
 
     }
 
+    //--- MOUSE MOTION LISTENER ----------------------------------------------------------------------------------------
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        gui.mouseMoved(e);
+    }
 
     //---- KEY LISTENER ------------------------------------------------------------------------------------------------
 
