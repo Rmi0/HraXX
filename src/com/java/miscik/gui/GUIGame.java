@@ -131,6 +131,7 @@ public class GUIGame extends Canvas implements Runnable {
         //RENDER OPTIONS ------------------------------------------
         g.drawImage(ImageReader.readImg("undo.png"),WIDTH-31,HEIGHT-32,null);
         g.drawImage(ImageReader.readImg("clear.png"),WIDTH-31,HEIGHT-64,null);
+        g.drawImage(ImageReader.readImg("info.png"),WIDTH-31,HEIGHT-96,null);
         if (mouseX >= WIDTH-32) {
             //UNDO
             if (mouseY >= HEIGHT-32) {
@@ -146,6 +147,13 @@ public class GUIGame extends Canvas implements Runnable {
                 g.setColor(Color.BLACK);
                 g.getFont().deriveFont(16f);
                 g.drawString("RESET", WIDTH - 127, HEIGHT - 37);
+            } else if (mouseY >= HEIGHT-96) {
+            //INFO
+                g.setColor(new Color(255, 255, 255, 100));
+                g.fillRect(WIDTH - 132, HEIGHT - 96, 100, 32);
+                g.setColor(Color.BLACK);
+                g.getFont().deriveFont(16f);
+                g.drawString("INFO", WIDTH - 127, HEIGHT - 69);
             }
         }
 
@@ -195,6 +203,8 @@ public class GUIGame extends Canvas implements Runnable {
                 game.getGameField().initField();
                 game.setPlr(Tile.PLAYER_A);
             }
+            //INFO
+            if (mouseY >= HEIGHT-96 && mouseY < HEIGHT-64) this.renderInfo = !this.renderInfo;
             return;
         }
 
