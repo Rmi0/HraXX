@@ -1,16 +1,21 @@
 package com.java.miscik.gui;
 
 import com.java.miscik.Game;
+import com.java.miscik.GamesaveManager;
 import com.java.miscik.ImageReader;
 import com.java.miscik.Tile;
 import com.java.miscik.exceptions.InvalidTileException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 
 public class GUIGame extends Canvas implements Runnable {
 
@@ -132,6 +137,10 @@ public class GUIGame extends Canvas implements Runnable {
         g.drawImage(ImageReader.readImg("undo.png"),WIDTH-31,HEIGHT-32,null);
         g.drawImage(ImageReader.readImg("clear.png"),WIDTH-31,HEIGHT-64,null);
         g.drawImage(ImageReader.readImg("info.png"),WIDTH-31,HEIGHT-96,null);
+        g.setColor(Color.RED);
+        g.fillRect(WIDTH-32, HEIGHT-128, 32, 32);
+        g.setColor(Color.BLUE);
+        g.fillRect(WIDTH-32, HEIGHT-160, 32, 32);
         if (mouseX >= WIDTH-32) {
             //UNDO
             if (mouseY >= HEIGHT-32) {
@@ -154,6 +163,20 @@ public class GUIGame extends Canvas implements Runnable {
                 g.setColor(Color.BLACK);
                 g.getFont().deriveFont(16f);
                 g.drawString("INFO", WIDTH - 127, HEIGHT - 69);
+            } else if (mouseY >= HEIGHT-128) {
+                //SAVE
+                g.setColor(new Color(255, 255, 255, 100));
+                g.fillRect(WIDTH - 132, HEIGHT - 128, 100, 32);
+                g.setColor(Color.BLACK);
+                g.getFont().deriveFont(16f);
+                g.drawString("SAVE", WIDTH - 127, HEIGHT - 101);
+            } else if (mouseY >= HEIGHT-160) {
+                //LOAD
+                g.setColor(new Color(255, 255, 255, 100));
+                g.fillRect(WIDTH - 132, HEIGHT - 160, 100, 32);
+                g.setColor(Color.BLACK);
+                g.getFont().deriveFont(16f);
+                g.drawString("LOAD", WIDTH - 127, HEIGHT - 132);
             }
         }
 
@@ -205,6 +228,25 @@ public class GUIGame extends Canvas implements Runnable {
             }
             //INFO
             if (mouseY >= HEIGHT-96 && mouseY < HEIGHT-64) this.renderInfo = !this.renderInfo;
+            //SAVE
+            if (mouseY >= HEIGHT-128 && mouseY < HEIGHT-96) {
+                JFileChooser jfc = new JFileChooser();
+                jfc.setAcceptAllFileFilterUsed(false);
+                jfc.addChoosableFileFilter(new FileNameExtensionFilter("HraXX game save file", "game"));
+                jfc.showDialog(this, "Save");
+                File f = jfc.getSelectedFile();
+                GamesaveManager.getInstance().save(game, f.getPath()+".game");
+            }
+            //LOAD
+            if (mouseY >= HEIGHT-160 && mouseY < HEIGHT-128) {
+                JFileChooser jfc = new JFileChooser();
+                jfc.setAcceptAllFileFilterUsed(false);
+                jfc.addChoosableFileFilter(new FileNameExtensionFilter("HraXX game save file", "game"));
+                jfc.showDialog(this, "Load");
+                File f = jfc.getSelectedFile();
+                Game game = GamesaveManager.getInstance().load(f.getPath());
+                if (game != null) this.game = game;
+            }
             return;
         }
 

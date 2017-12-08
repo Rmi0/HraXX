@@ -1,9 +1,11 @@
 package com.java.miscik;
 
+import java.io.Serializable;
+
 /**
  * Created by Rolo on 5. 10. 2017.
  */
-public class Tile {
+public class Tile implements Serializable {
 
     public static final int EMPTY = 0;
     public static final int PLAYER_A = 1;

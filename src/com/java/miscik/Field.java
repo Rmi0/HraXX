@@ -3,11 +3,12 @@ package com.java.miscik;
 import com.java.miscik.exceptions.InvalidTileException;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Created by Rolo on 5. 10. 2017.
  */
-public class Field {
+public class Field implements Serializable {
 
     private Tile[][] gameField;
 

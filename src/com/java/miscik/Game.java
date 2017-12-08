@@ -2,6 +2,7 @@ package com.java.miscik;
 
 import com.java.miscik.exceptions.InvalidTileException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -9,7 +10,7 @@ import java.util.Scanner;
 /**
  * Created by Rolo on 5. 10. 2017.
  */
-public class Game {
+public class Game implements Serializable {
 
     private int plr;
     private Field gameField;
